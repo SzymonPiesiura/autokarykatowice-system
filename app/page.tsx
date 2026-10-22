@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "./lib/supabase";
 
 type Trip = {
   id: string; date: string; time: string; customer: string; route: string;
@@ -39,6 +40,26 @@ export default function Home() {
   const [newRoute, setNewRoute] = useState("");
   const [newDate, setNewDate] = useState("2026-10-28");
   const [newRevenue, setNewRevenue] = useState("1500");
+  const [dbStatus, setDbStatus] = useState("Sprawdzam połączenie...");
+
+useEffect(() => {
+  async function checkConnection() {
+    const { error } = await supabase
+      .from("orders")
+      .select("id")
+      .limit(1);
+
+    if (error) {
+      console.error("Błąd połączenia z bazą:", error.message);
+      setDbStatus("Nie udało się odczytać zleceń z bazy.");
+      return;
+    }
+
+    setDbStatus("Połączenie z bazą działa.");
+  }
+
+  checkConnection();
+}, []);
 
   const filteredTrips = useMemo(() => trips.filter(t =>
     [t.id, t.customer, t.route, t.vehicle, t.driver, t.status].join(" ").toLowerCase().includes(search.toLowerCase())
@@ -64,7 +85,10 @@ export default function Home() {
         <span className="demoBadge">TRYB DEMO</span>
       </header>
 
-      <div className="notice"><strong>Ważne:</strong> to prototyp z fikcyjnymi danymi. Zmiany nie są zapisywane w bazie i znikną po odświeżeniu strony.</div>
+      <div className="notice">
+  <strong>Status bazy danych:</strong> {dbStatus}
+  <p>Dotychczasowe zlecenia nadal są danymi demonstracyjnymi.</p>
+</div>
 
       <section className="welcome">
         <div><p className="eyebrow">CENTRUM OPERACYJNE</p><h1>Zarządzanie flotą</h1><p className="subhead">Wyjazdy, pojazdy, kierowcy i rentowność w jednym miejscu.</p></div>
