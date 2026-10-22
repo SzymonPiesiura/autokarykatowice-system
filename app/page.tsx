@@ -79,69 +79,6 @@ const [loginBusy, setLoginBusy] = useState(false);
 
   checkUser();
 
-if (authLoading) {
-  return (
-    <main className="shell">
-      <section className="panel">
-        Sprawdzanie logowania...
-      </section>
-    </main>
-  );
-}
-
-if (!userEmail) {
-  return (
-    <main className="shell">
-      <header className="topbar">
-        <div className="brandMark">AK</div>
-        <div className="brandText">
-          <strong>AUTOKARY KATOWICE</strong>
-          <span>Panel zarządzania flotą</span>
-        </div>
-      </header>
-
-      <section className="panel" style={{ maxWidth: 440, margin: "48px auto", padding: 24 }}>
-        <h1>Logowanie</h1>
-        <p>Zaloguj się na konto biura.</p>
-
-        <form onSubmit={handleLogin}>
-          <label>
-            Adres e-mail
-            <input
-              type="email"
-              required
-              value={loginEmail}
-              onChange={e => setLoginEmail(e.target.value)}
-              autoComplete="username"
-            />
-          </label>
-
-          <label>
-            Hasło
-            <input
-              type="password"
-              required
-              value={loginPassword}
-              onChange={e => setLoginPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-          </label>
-
-          {loginError && (
-            <p role="alert" style={{ color: "crimson" }}>
-              {loginError}
-            </p>
-          )}
-
-          <button className="primary" type="submit" disabled={loginBusy}>
-            {loginBusy ? "Logowanie..." : "Zaloguj się"}
-          </button>
-        </form>
-      </section>
-    </main>
-  );
-}
-
   return () => {
     active = false;
   };
@@ -160,6 +97,7 @@ async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
   if (error || !data.user) {
     setLoginError("Logowanie nie powiodło się. Sprawdź e-mail i hasło.");
     setLoginBusy(false);
+    
     return;
   }
 
@@ -200,22 +138,88 @@ useEffect(() => {
 
   checkConnection();
 }, []);
-
-  const filteredTrips = useMemo(() => trips.filter(t =>
+  
+    const filteredTrips = useMemo(() => trips.filter(t =>
     [t.id, t.customer, t.route, t.vehicle, t.driver, t.status].join(" ").toLowerCase().includes(search.toLowerCase())
   ), [trips, search]);
-
   const totalRevenue = trips.reduce((s, t) => s + t.revenue, 0);
   const totalCosts = trips.reduce((s, t) => s + t.costs, 0);
   const margin = totalRevenue - totalCosts;
 
-  function addTrip() {
+    function addTrip() {
     if (!newCustomer.trim() || !newRoute.trim() || !newDate) return;
     const nextId = `AK-DEMO-${String(trips.length + 1).padStart(3, "0")}`;
     setTrips([{ id: nextId, date: newDate, time: "08:00", customer: `${newCustomer.trim()} (DEMO)`, route: newRoute.trim(), vehicle: "Do przydzielenia", driver: "Do przydzielenia", status: "Nowe", revenue: Number(newRevenue) || 0, costs: 0 }, ...trips]);
     setShowNew(false); setNewCustomer(""); setNewRoute("");
     setTab("trips");
   }
+
+    if (authLoading) {
+    return (
+      <main className="shell">
+        <section className="panel">
+          Sprawdzanie logowania...
+        </section>
+      </main>
+    );
+  }
+
+  if (!userEmail) {
+    return (
+      <main className="shell">
+        <header className="topbar">
+          <div className="brandMark">AK</div>
+          <div className="brandText">
+            <strong>AUTOKARY KATOWICE</strong>
+            <span>Panel zarządzania flotą</span>
+          </div>
+        </header>
+
+        <section
+          className="panel"
+          style={{ maxWidth: 440, margin: "48px auto", padding: 24 }}
+        >
+          <h1>Logowanie</h1>
+          <p>Zaloguj się na konto biura.</p>
+
+          <form onSubmit={handleLogin}>
+            <label>
+              Adres e-mail
+              <input
+                type="email"
+                required
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                autoComplete="username"
+              />
+            </label>
+
+            <label>
+              Hasło
+              <input
+                type="password"
+                required
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                autoComplete="current-password"
+              />
+            </label>
+
+            {loginError && (
+              <p role="alert" style={{ color: "crimson" }}>
+                {loginError}
+              </p>
+            )}
+
+            <button className="primary" type="submit" disabled={loginBusy}>
+              {loginBusy ? "Logowanie..." : "Zaloguj się"}
+            </button>
+          </form>
+        </section>
+      </main>
+    );
+  }
+
 
   return (
     <main className="shell">
