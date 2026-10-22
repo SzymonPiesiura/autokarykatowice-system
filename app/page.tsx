@@ -41,6 +41,146 @@ export default function Home() {
   const [newDate, setNewDate] = useState("2026-10-28");
   const [newRevenue, setNewRevenue] = useState("1500");
   const [dbStatus, setDbStatus] = useState("Sprawdzam połączenie...");
+  const [authLoading, setAuthLoading] = useState(true);
+const [userEmail, setUserEmail] = useState("");
+const [loginEmail, setLoginEmail] = useState("");
+const [loginPassword, setLoginPassword] = useState("");
+const [loginError, setLoginError] = useState("");
+const [loginBusy, setLoginBusy] = useState(false);
+  useEffect(() => {
+  let active = true;
+
+  async function checkUser() {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      if (active) setAuthLoading(false);
+      return;
+    }
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .maybeSingle();
+
+    if (!active) return;
+
+    if (error || profile?.role !== "office") {
+      await supabase.auth.signOut();
+      setLoginError("To konto nie ma uprawnień biura.");
+      setAuthLoading(false);
+      return;
+    }
+
+    setUserEmail(session.user.email ?? "");
+    setAuthLoading(false);
+  }
+
+  checkUser();
+
+if (authLoading) {
+  return (
+    <main className="shell">
+      <section className="panel">
+        Sprawdzanie logowania...
+      </section>
+    </main>
+  );
+}
+
+if (!userEmail) {
+  return (
+    <main className="shell">
+      <header className="topbar">
+        <div className="brandMark">AK</div>
+        <div className="brandText">
+          <strong>AUTOKARY KATOWICE</strong>
+          <span>Panel zarządzania flotą</span>
+        </div>
+      </header>
+
+      <section className="panel" style={{ maxWidth: 440, margin: "48px auto", padding: 24 }}>
+        <h1>Logowanie</h1>
+        <p>Zaloguj się na konto biura.</p>
+
+        <form onSubmit={handleLogin}>
+          <label>
+            Adres e-mail
+            <input
+              type="email"
+              required
+              value={loginEmail}
+              onChange={e => setLoginEmail(e.target.value)}
+              autoComplete="username"
+            />
+          </label>
+
+          <label>
+            Hasło
+            <input
+              type="password"
+              required
+              value={loginPassword}
+              onChange={e => setLoginPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+          </label>
+
+          {loginError && (
+            <p role="alert" style={{ color: "crimson" }}>
+              {loginError}
+            </p>
+          )}
+
+          <button className="primary" type="submit" disabled={loginBusy}>
+            {loginBusy ? "Logowanie..." : "Zaloguj się"}
+          </button>
+        </form>
+      </section>
+    </main>
+  );
+}
+
+  return () => {
+    active = false;
+  };
+}, []);
+
+async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+  setLoginError("");
+  setLoginBusy(true);
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: loginEmail,
+    password: loginPassword,
+  });
+
+  if (error || !data.user) {
+    setLoginError("Logowanie nie powiodło się. Sprawdź e-mail i hasło.");
+    setLoginBusy(false);
+    return;
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", data.user.id)
+    .maybeSingle();
+
+  if (profileError || profile?.role !== "office") {
+    await supabase.auth.signOut();
+    setLoginError("Konto nie ma uprawnień biura.");
+    setLoginBusy(false);
+    return;
+  }
+
+  setUserEmail(data.user.email ?? "");
+  setLoginPassword("");
+  setAuthLoading(false);
+  setLoginBusy(false);
+}
 
 useEffect(() => {
   async function checkConnection() {
