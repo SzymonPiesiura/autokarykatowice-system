@@ -102,6 +102,22 @@ const datePL = (s: string) => {
 	return new Date(s + "T12:00:00").toLocaleDateString("pl-PL");
 };
 
+const tripDayLabel = (date: string): "DZIŚ" | "JUTRO" | null => {
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	const tomorrow = new Date(today);
+	tomorrow.setDate(tomorrow.getDate() + 1);
+
+	const tripDate = new Date(`${date}T00:00:00`);
+
+	if (Number.isNaN(tripDate.getTime())) return null;
+
+	if (tripDate.getTime() === today.getTime()) return "DZIŚ";
+	if (tripDate.getTime() === tomorrow.getTime()) return "JUTRO";
+
+	return null;
+};
 const dateTimeParts = (value: string) => {
 	const date = new Date(value);
 
@@ -1093,7 +1109,32 @@ export default function Home() {
 								{trips.map((trip) => (
 									<tr key={trip.dbId}>
 										<td>
-											<strong>{trip.id}</strong>
+											{tripDayLabel(trip.date) && (
+												<span
+													style={{
+														display: "inline-block",
+														marginBottom: 5,
+														padding: "3px 7px",
+														borderRadius: 5,
+														fontSize: 10,
+														fontWeight: 800,
+														background:
+															tripDayLabel(trip.date) === "DZIŚ"
+																? "#fee2e2"
+																: "#ffedd5",
+														color:
+															tripDayLabel(trip.date) === "DZIŚ"
+																? "#b91c1c"
+																: "#c2410c",
+													}}
+												>
+													{tripDayLabel(trip.date)}
+												</span>
+											)}
+											<strong style={{ display: "block" }}>
+												{datePL(trip.date)}
+											</strong>
+											<small>{trip.time}</small>
 										</td>
 										<td>{trip.customer}</td>
 										<td>{money(trip.revenue)}</td>
