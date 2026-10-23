@@ -126,7 +126,48 @@ const statusLabel = (status: string) => {
 		offer_sent: "Oferta wysłana",
 		assigned: "Przydzielone",
 	};
+	const statusColor = (status: string) => {
+		const colors: Record<string, React.CSSProperties> = {
+			new: {
+				background: "#e2e8f0",
+				color: "#334155",
+				border: "1px solid #cbd5e1",
+			},
+			pending: {
+				background: "#fef3c7",
+				color: "#92400e",
+				border: "1px solid #fcd34d",
+			},
+			confirmed: {
+				background: "#dbeafe",
+				color: "#1d4ed8",
+				border: "1px solid #93c5fd",
+			},
+			in_progress: {
+				background: "#ede9fe",
+				color: "#6d28d9",
+				border: "1px solid #c4b5fd",
+			},
+			completed: {
+				background: "#dcfce7",
+				color: "#166534",
+				border: "1px solid #86efac",
+			},
+			cancelled: {
+				background: "#fee2e2",
+				color: "#991b1b",
+				border: "1px solid #fca5a5",
+			},
+		};
 
+		return (
+			colors[status] ?? {
+				background: "#f1f5f9",
+				color: "#334155",
+				border: "1px solid #cbd5e1",
+			}
+		);
+	};
 	return labels[status] ?? status;
 };
 
@@ -1285,6 +1326,7 @@ function TripTable({
 										maxWidth: 210,
 										padding: "7px 10px",
 										cursor: statusBusy === trip.dbId ? "wait" : "pointer",
+										...statusColor(trip.status),
 									}}
 								>
 									{!TRIP_STATUSES.some((s) => s.value === trip.status) && (
