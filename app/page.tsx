@@ -122,13 +122,13 @@ export default function Home() {
     }
 
     const orders = (data ?? []) as DbOrder[];
-    const customerIds = [
-      ...new Set(
-        orders
-          .map((order) => order.customer_id)
-          .filter((id): id is string => Boolean(id))
-      ),
-    ];
+ const customerIds = Array.from(
+  new Set(
+    orders
+      .map((order) => order.customer_id)
+      .filter((id): id is string => Boolean(id))
+  )
+);
 
     let customerNames: Record<string, string> = {};
 
