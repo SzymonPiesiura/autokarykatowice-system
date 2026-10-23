@@ -1148,6 +1148,10 @@ export default function Home() {
 											<strong style={{ display: "block" }}>
 												{datePL(trip.date)}
 											</strong>
+											<small style={{ display: "block", color: "red" }}>
+												Debug: {JSON.stringify(trip.date)} /{" "}
+												{tripDayLabel(trip.date) ?? "brak"}
+											</small>
 											<small>{trip.time}</small>
 										</td>
 										<td>{trip.customer}</td>
