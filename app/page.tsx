@@ -188,6 +188,7 @@ export default function Home() {
 	const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
 	const [deleteBusy, setDeleteBusy] = useState<string | null>(null);
 	const [statusBusy, setStatusBusy] = useState<string | null>(null);
+	const [statusFilter, setStatusFilter] = useState("all");
 
 	const [newCustomer, setNewCustomer] = useState("");
 	const [newStart, setNewStart] = useState("");
@@ -692,8 +693,8 @@ export default function Home() {
 
 	const filteredTrips = useMemo(
 		() =>
-			trips.filter((trip) =>
-				[
+			trips.filter((trip) => {
+				const matchesSearch = [
 					trip.id,
 					trip.customer,
 					trip.route,
@@ -703,9 +704,14 @@ export default function Home() {
 				]
 					.join(" ")
 					.toLowerCase()
-					.includes(search.toLowerCase()),
-			),
-		[trips, search],
+					.includes(search.toLowerCase());
+
+				const matchesStatus =
+					statusFilter === "all" || trip.status === statusFilter;
+
+				return matchesSearch && matchesStatus;
+			}),
+		[trips, search, statusFilter],
 	);
 
 	const totalRevenue = trips.reduce((sum, trip) => sum + trip.revenue, 0);
@@ -923,6 +929,27 @@ export default function Home() {
 							＋ Nowe zlecenie
 						</button>
 					</div>
+
+					<select
+						value={statusFilter}
+						onChange={(e) => setStatusFilter(e.target.value)}
+						className="status"
+						style={{
+							padding: "10px 12px",
+							borderRadius: 8,
+							border: "1px solid #cbd5e1",
+							background: "#fff",
+							minWidth: 220,
+						}}
+					>
+						<option value="all">Wszystkie statusy</option>
+						<option value="new">Nowe</option>
+						<option value="pending">Oczekuje na potwierdzenie</option>
+						<option value="confirmed">Potwierdzone</option>
+						<option value="in_progress">W trakcie realizacji</option>
+						<option value="completed">Zrealizowane</option>
+						<option value="cancelled">Anulowane</option>
+					</select>
 
 					<input
 						className="search"
