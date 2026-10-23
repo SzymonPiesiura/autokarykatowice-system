@@ -105,26 +105,20 @@ const datePL = (s: string) => {
 const tripDayLabel = (date: string): "DZIŚ" | "JUTRO" | null => {
 	if (!date) return null;
 
-	const today = new Date();
-	const todayString = [
-		today.getFullYear(),
-		String(today.getMonth() + 1).padStart(2, "0"),
-		String(today.getDate()).padStart(2, "0"),
-	].join("-");
+	const tripDate = date.slice(0, 10);
+
+	const now = new Date();
+
+	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
 	const tomorrow = new Date(today);
 	tomorrow.setDate(tomorrow.getDate() + 1);
 
-	const tomorrowString = [
-		tomorrow.getFullYear(),
-		String(tomorrow.getMonth() + 1).padStart(2, "0"),
-		String(tomorrow.getDate()).padStart(2, "0"),
-	].join("-");
+	const formatDate = (d: Date) =>
+		`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-	const tripDateString = date.slice(0, 10);
-
-	if (tripDateString === todayString) return "DZIŚ";
-	if (tripDateString === tomorrowString) return "JUTRO";
+	if (tripDate === formatDate(today)) return "DZIŚ";
+	if (tripDate === formatDate(tomorrow)) return "JUTRO";
 
 	return null;
 };
