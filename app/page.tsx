@@ -103,18 +103,28 @@ const datePL = (s: string) => {
 };
 
 const tripDayLabel = (date: string): "DZIŚ" | "JUTRO" | null => {
+	if (!date) return null;
+
 	const today = new Date();
-	today.setHours(0, 0, 0, 0);
+	const todayString = [
+		today.getFullYear(),
+		String(today.getMonth() + 1).padStart(2, "0"),
+		String(today.getDate()).padStart(2, "0"),
+	].join("-");
 
 	const tomorrow = new Date(today);
 	tomorrow.setDate(tomorrow.getDate() + 1);
 
-	const tripDate = new Date(`${date}T00:00:00`);
+	const tomorrowString = [
+		tomorrow.getFullYear(),
+		String(tomorrow.getMonth() + 1).padStart(2, "0"),
+		String(tomorrow.getDate()).padStart(2, "0"),
+	].join("-");
 
-	if (Number.isNaN(tripDate.getTime())) return null;
+	const tripDateString = date.slice(0, 10);
 
-	if (tripDate.getTime() === today.getTime()) return "DZIŚ";
-	if (tripDate.getTime() === tomorrow.getTime()) return "JUTRO";
+	if (tripDateString === todayString) return "DZIŚ";
+	if (tripDateString === tomorrowString) return "JUTRO";
 
 	return null;
 };
