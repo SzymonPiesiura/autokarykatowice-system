@@ -1118,6 +1118,10 @@ export default function Home() {
 							<tbody>
 								{trips.map((trip) => (
 									<tr key={trip.dbId}>
+										<td style={{ fontSize: 11, color: "#64748b" }}>
+											data: {JSON.stringify(trip.date)} | etykieta:{" "}
+											{tripDayLabel(trip.date) ?? "brak"}
+										</td>
 										<td>
 											{tripDayLabel(trip.date) && (
 												<span
