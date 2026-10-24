@@ -1382,7 +1382,33 @@ function TripTable({
 					{trips.map((trip) => (
 						<tr key={trip.dbId}>
 							<td>
-								<strong>{datePL(trip.date)}</strong>
+								{tripDayLabel(trip.date) && (
+									<span
+										style={{
+											display: "inline-block",
+											width: "fit-content",
+											marginBottom: 5,
+											padding: "3px 7px",
+											borderRadius: 5,
+											fontSize: 10,
+											fontWeight: 800,
+											background:
+												tripDayLabel(trip.date) === "DZIŚ"
+													? "#fee2e2"
+													: "#ffedd5",
+											color:
+												tripDayLabel(trip.date) === "DZIŚ"
+													? "#b91c1c"
+													: "#c2410c",
+										}}
+									>
+										{tripDayLabel(trip.date)}
+									</span>
+								)}
+
+								<strong style={{ display: "block" }}>
+									{datePL(trip.date)}
+								</strong>
 								<small>{trip.time}</small>
 							</td>
 
